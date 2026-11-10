@@ -255,6 +255,17 @@ static bool bridge_active;
 /* W29N02KVSIAF: ef da 10 95 06.  SIAE ends in 07, W29N02GV starts at 90. */
 static const u8 winbond_w29n02kv_id[5] = { 0xef, 0xda, 0x10, 0x95, 0x06 };
 
+static bool nand_id_is_skyhigh_s34ml02g(const struct nand_chip *nand)
+{
+        /* S34ML02G300TFI00: 01 da 00 95 46 */
+        if (nand->id.len >= 5 &&
+            nand->id.data[0] == 0x01 && nand->id.data[1] == 0xda &&
+            nand->id.data[2] == 0x00 && nand->id.data[3] == 0x95 &&
+            nand->id.data[4] == 0x46)
+                return true;
+        return false;
+}
+
 static bool nand_id_is_winbond_w29n02kv(const struct nand_chip *nand)
 {
 	int i;
@@ -979,11 +990,11 @@ static int airoha_nfc_attach_chip(struct nand_chip *nand)
 	 * legacy UBI is readable, and leave the switch to the recovery UI.
 	 */
 	if (IS_ENABLED(CONFIG_AIROHA_NAND_ECC_BRIDGE) &&
-	    nand_id_is_winbond_w29n02kv(nand)) {
+	    (nand_id_is_winbond_w29n02kv(nand) || nand_id_is_skyhigh_s34ml02g(nand))) {
 		ecc_strength_override = 8;
 		bridge_active = true;
 		printf("EN7581 parallel NAND: MIGRATION build (8-bit read / 4-bit write)\n");
-		printf("  Winbond flash at ECC8/512; run 'nandecc 4' or rebuild UBI to migrate\n");
+		printf("  Winbond/Skyhigh flash at ECC8/512; run 'nandecc 4' or rebuild UBI to migrate\n");
 		printf("  then flash the OFFICIAL 4-bit U-Boot, not this file\n");
 	}
 
