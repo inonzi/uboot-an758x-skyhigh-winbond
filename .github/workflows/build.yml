@@ -1,4 +1,4 @@
-name: Build AN758x U-Boot (Winbond migration)
+name: Build AN758x U-Boot (Skyhigh/Winbond migration)
 
 # Temporary migration stack for Winbond W29N02KVSIAF boards:
 # BL2 and U-Boot read the vendor 8-bit layout and rewrite UBI at 4-bit, then
