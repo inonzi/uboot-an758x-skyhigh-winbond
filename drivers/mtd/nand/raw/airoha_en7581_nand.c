@@ -255,14 +255,25 @@ static bool bridge_active;
 /* W29N02KVSIAF: ef da 10 95 06.  SIAE ends in 07, W29N02GV starts at 90. */
 static const u8 winbond_w29n02kv_id[5] = { 0xef, 0xda, 0x10, 0x95, 0x06 };
 
-static bool nand_id_is_skyhigh_s34ml02g(const struct nand_chip *nand)
+/* S34ML02G300TFI00: 01 da 00 95 46.  S34ML02H200TFI00: 01 da 90 95 46 (alt: 01 da 46 95 90). */
+static const u8 skyhigh_s34ml02_ids[][5] = {
+        { 0x01, 0xda, 0x00, 0x95, 0x46 },
+        { 0x01, 0xda, 0x90, 0x95, 0x46 },
+        { 0x01, 0xda, 0x46, 0x95, 0x90 }
+};
+
+static bool nand_id_is_skyhigh_s34ml02(const struct nand_chip *nand)
 {
-        /* S34ML02G300TFI00: 01 da 00 95 46 */
-        if (nand->id.len >= 5 &&
-            nand->id.data[0] == 0x01 && nand->id.data[1] == 0xda &&
-            nand->id.data[2] == 0x00 && nand->id.data[3] == 0x95 &&
-            nand->id.data[4] == 0x46)
-                return true;
+        int i;
+
+        if (nand->id.len < 5)
+                return false;
+
+        for (i = 0; i < ARRAY_SIZE(skyhigh_s34ml02_ids); i++) {
+                if (memcmp(nand->id.data, skyhigh_s34ml02_ids[i], 5) == 0)
+                        return true;
+        }
+
         return false;
 }
 
@@ -990,7 +1001,7 @@ static int airoha_nfc_attach_chip(struct nand_chip *nand)
 	 * legacy UBI is readable, and leave the switch to the recovery UI.
 	 */
 	if (IS_ENABLED(CONFIG_AIROHA_NAND_ECC_BRIDGE) &&
-	    (nand_id_is_winbond_w29n02kv(nand) || nand_id_is_skyhigh_s34ml02g(nand))) {
+	    (nand_id_is_winbond_w29n02kv(nand) || nand_id_is_skyhigh_s34ml02(nand))) {
 		ecc_strength_override = 8;
 		bridge_active = true;
 		printf("EN7581 parallel NAND: MIGRATION build (8-bit read / 4-bit write)\n");
