@@ -662,7 +662,7 @@ config NAND_AIROHA_EN7581
 	  UBI for bad-block and wear management.
 
 config AIROHA_NAND_ECC_BRIDGE
-	bool "Bridge build: read legacy 8-bit Winbond flash and migrate to 4-bit"
+	bool "Bridge build: read legacy 8-bit Winbond/Skyhigh flash and migrate to 4-bit"
 	depends on NAND_AIROHA_EN7581
 	help
 	  Builds a one-shot recovery U-Boot for Winbond flash that the vendor

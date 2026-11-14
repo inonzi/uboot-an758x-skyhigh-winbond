@@ -16,7 +16,7 @@ Optional environment:
   BUILD_ROOT            Build workspace (default: <repo>/build)
   OUTPUT_ROOT           Firmware output directory (default: <repo>/output)
   BUILD_JOBS            Parallel jobs (default: detected CPU count)
-  BRIDGE_ECC=1          Build the temporary Winbond recovery stack that reads
+  BRIDGE_ECC=1          Build the temporary Winbond/Skyhigh recovery stack that reads
                         the vendor 8-bit layout and migrates to 4-bit
   BRIDGE_TBB=0          Also build that recovery stack without image
                         authentication, so no signing key is required

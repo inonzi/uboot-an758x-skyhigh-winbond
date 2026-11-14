@@ -465,14 +465,16 @@ parallel_nand_probe(struct SPI_NAND_FLASH_INFO_T *result)
 	       result->page_size, result->erase_size, result->soc_ecc_ability);
 
 #ifdef AIROHA_NAND_ECC_BRIDGE
-	/*
-	 * The migration table only overrides W29N02KVSIAF.  Say so out loud when
-	 * this preloader ends up on any other part: it then behaves exactly like
-	 * the released one and the board should be returned to the stock stack.
-	 */
-	if (strcmp((const char *)result->ptr_name, "W29N02KVSIAF") != 0)
-		NOTICE("Migration preloader: built for W29N02KVSIAF, %s keeps stock ECC\n",
-		       result->ptr_name);
+        /*
+         * The migration table overrides both Winbond W29N02KVSIAF and
+         * Skyhigh S34ML02G300TFI00 / S34ML02H200TFI000.
+         * Check if the controller really ended up with ECC 8. If not
+         * (e.g. unsupported chip), warn out loud so the user knows
+         * to return to the stock 4-bit stack.
+         */
+        if (result->soc_ecc_ability != 8)
+                NOTICE("Migration preloader: %s keeps stock ECC%u/512\n",
+                       result->ptr_name, result->soc_ecc_ability);
 #endif
 
 	return SPI_NAND_FLASH_RTN_NO_ERROR;
